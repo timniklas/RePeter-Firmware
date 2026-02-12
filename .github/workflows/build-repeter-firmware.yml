@@ -4,10 +4,8 @@ permissions:
   contents: write
 
 on:
-  workflow_dispatch:
-  push:
-    tags:
-      - 'companion-*'
+  release:
+    types: [published]
 
 jobs:
 
