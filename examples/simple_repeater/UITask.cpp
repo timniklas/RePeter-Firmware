@@ -23,6 +23,18 @@ static const uint8_t meshcore_logo [] PROGMEM = {
     0xe3, 0xe3, 0x8f, 0xff, 0x1f, 0xfc, 0x3c, 0x0e, 0x1f, 0xf8, 0xff, 0xf8, 0x70, 0x3c, 0x7f, 0xf8, 
 };
 
+// 'logo', 32x32px
+const unsigned char bremesh_logo [] PROGMEM = {
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x1f, 0xc0, 0x00, 0x00, 0xff, 0xf0, 0x00, 0x01, 0xc0, 0x3c, 0x00, 
+	0x07, 0x00, 0x0e, 0x00, 0x0e, 0x00, 0x07, 0x00, 0x0c, 0x1f, 0x81, 0x80, 0x18, 0x7f, 0xe0, 0x80, 
+	0x30, 0xe0, 0x30, 0x00, 0x31, 0x80, 0x18, 0x00, 0x23, 0x80, 0x0c, 0x00, 0x63, 0x0f, 0x8e, 0x00, 
+	0x63, 0x1f, 0xc0, 0x1c, 0x66, 0x30, 0x80, 0x3e, 0x66, 0x30, 0x7f, 0xfe, 0x66, 0x30, 0xff, 0xfe, 
+	0x66, 0x39, 0xc0, 0x3e, 0x63, 0x1b, 0x00, 0x38, 0x63, 0x03, 0x00, 0x60, 0x21, 0x83, 0x00, 0x60, 
+	0x31, 0xc3, 0x00, 0xc0, 0x30, 0xe3, 0x00, 0xc0, 0x18, 0x7b, 0x01, 0x80, 0x0c, 0x03, 0x03, 0x00, 
+	0x06, 0x03, 0x07, 0x00, 0x03, 0x83, 0x1c, 0x00, 0x01, 0xe3, 0x78, 0x00, 0x00, 0x7f, 0xe0, 0x00, 
+	0x00, 0x07, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+};
+
 void UITask::renderBatteryIndicator(DisplayDriver* display, uint16_t batteryMilliVolts) {
   // Convert millivolts to percentage
   const int minMilliVolts = 3000; // Minimum voltage (e.g., 3.0V)
@@ -74,27 +86,31 @@ void UITask::renderCurrScreen() {
   if (millis() < BOOT_SCREEN_MILLIS) { // boot screen
     // meshcore logo
     _display->setColor(DisplayDriver::BLUE);
-    int logoWidth = 128;
-    _display->drawXbm((_display->width() - logoWidth) / 2, 3, meshcore_logo, logoWidth, 13);
+    int logoWidth = 32;
+    _display->drawXbm((_display->width() - logoWidth) / 2, 0, bremesh_logo, logoWidth, 32);
+
+
+    // node type
+    const char* node_type = "BreMesh RePeter";
+    uint16_t typeWidth = _display->getTextWidth(node_type);
+    _display->setCursor((_display->width() - typeWidth) / 2, 35);
+    _display->print(node_type);
 
     // version info
     _display->setColor(DisplayDriver::LIGHT);
     _display->setTextSize(1);
     uint16_t versionWidth = _display->getTextWidth(_version_info);
-    _display->setCursor((_display->width() - versionWidth) / 2, 22);
+    _display->setCursor((_display->width() - versionWidth) / 2, 55);
     _display->print(_version_info);
-
-    // node type
-    const char* node_type = "< Repeater >";
-    uint16_t typeWidth = _display->getTextWidth(node_type);
-    _display->setCursor((_display->width() - typeWidth) / 2, 35);
-    _display->print(node_type);
   } else {  // home screen
-    // node name
-    _display->setCursor(0, 0);
-    _display->setTextSize(1);
-    _display->setColor(DisplayDriver::GREEN);
-    _display->print(_node_prefs->node_name);
+    // time
+    _display->setCursor(0, 2);
+    uint32_t now = _clock->getCurrentTime();
+    DateTime dt = DateTime(now);
+    char buffer[32];
+    sprintf(buffer, "%02d.%02d.%d %02d:%02d",
+            dt.day(), dt.month(), dt.year(), dt.hour(), dt.minute());
+    _display->print(buffer);
 
     // freq / sf
     _display->setCursor(0, 20);
@@ -112,14 +128,11 @@ void UITask::renderCurrScreen() {
     sprintf(tmp, "BAT: %03.2f Volt", _board->getBattMilliVolts() / 1000.0);
     _display->print(tmp);
 
-    // time
+    // node name
     _display->setCursor(0, 55);
-    uint32_t now = _clock->getCurrentTime();
-    DateTime dt = DateTime(now);
-    char buffer[32];
-    sprintf(buffer, "%02d.%02d.%d %02d:%02d UTC",
-            dt.day(), dt.month(), dt.year(), dt.hour(), dt.minute());
-    _display->print(buffer);
+    _display->setTextSize(1);
+    _display->setColor(DisplayDriver::GREEN);
+    _display->print(_node_prefs->node_name);
 
     // battery icon
     renderBatteryIndicator(_display, _board->getBattMilliVolts());
