@@ -1,4 +1,4 @@
-name: Build Companion Firmwares
+name: Build RePeter Firmware
 
 permissions:
   contents: write
