@@ -27,14 +27,10 @@ jobs:
       - name: Upload Workflow Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: companion-firmwares
+          name: pingbot-firmware
           path: out
 
-      - name: Create Release
+      - name: Upload Assets to existing Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: Companion Firmware ${{ env.GIT_TAG_VERSION }}
-          body: ""
-          draft: true
           files: out/*
