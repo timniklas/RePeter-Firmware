@@ -21,10 +21,10 @@ jobs:
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build-environment
 
-      - name: Build Firmwares
+      - name: Build Firmware
         env:
           FIRMWARE_VERSION: ${{ env.GIT_TAG_VERSION }}
-        run: /usr/bin/env bash build.sh build-companion-firmwares
+        run: /usr/bin/env bash build.sh build-firmware ProMicro_repeter
 
       - name: Upload Workflow Artifacts
         uses: actions/upload-artifact@v4

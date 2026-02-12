@@ -810,7 +810,14 @@ void MyMesh::begin(FILESYSTEM *fs) {
   _cli.loadPrefs(_fs);
   acl.load(_fs, self_id);
   // TODO: key_store.begin();
-  region_map.load(_fs);
+  bool regions_loaded = region_map.load(_fs);
+  if(regions_loaded == false) {
+    //set defaults
+    auto parent = region_map.getWildcard();
+    auto region = region_map.putRegion("bremesh", parent.id);
+    region->flags &= ~REGION_DENY_FLOOD;
+    region_map.setHomeRegion(region);
+  }
 
 #if defined(WITH_BRIDGE)
   if (_prefs.bridge_enabled) {

@@ -1,4 +1,4 @@
-name: Build Room Server Firmwares
+name: Build Companion Firmwares
 
 permissions:
   contents: write
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - 'room-server-*'
+      - 'companion-*'
 
 jobs:
 
@@ -21,22 +21,22 @@ jobs:
       - name: Setup Build Environment
         uses: ./.github/actions/setup-build-environment
 
-      - name: Build Firmwares
+      - name: Build Firmware
         env:
           FIRMWARE_VERSION: ${{ env.GIT_TAG_VERSION }}
-        run: /usr/bin/env bash build.sh build-room-server-firmwares
+        run: /usr/bin/env bash build.sh build-firmware ProMicro_pingbot
 
       - name: Upload Workflow Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: room-server-firmwares
+          name: companion-firmwares
           path: out
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: Room Server Firmware ${{ env.GIT_TAG_VERSION }}
+          name: Companion Firmware ${{ env.GIT_TAG_VERSION }}
           body: ""
           draft: true
           files: out/*
