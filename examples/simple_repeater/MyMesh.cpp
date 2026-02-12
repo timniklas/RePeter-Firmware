@@ -809,6 +809,7 @@ void MyMesh::begin(FILESYSTEM *fs) {
   // load persisted prefs
   _cli.loadPrefs(_fs);
   acl.load(_fs, self_id);
+  _prefs.powersaving_enabled = 1;
   // TODO: key_store.begin();
   bool regions_loaded = region_map.load(_fs);
   if(regions_loaded == false) {
